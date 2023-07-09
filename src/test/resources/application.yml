@@ -1,0 +1,10 @@
+spring:
+  datasource:
+    url: jdbc:h2:mem:gym_test
+    username: username_t
+    password: password_t
+    driverClassName: org.h2.Driver
+  jpa:
+    hibernate:
+      ddl-auto: update
+      platform: org.hibernate.dialect.H2Dialect
