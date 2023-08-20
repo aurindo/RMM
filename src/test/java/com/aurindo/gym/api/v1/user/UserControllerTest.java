@@ -5,20 +5,17 @@ import com.aurindo.gym.api.v1.user.model.UserResponseModelAssembler;
 import com.aurindo.gym.domain.model.User;
 import com.aurindo.gym.domain.user.UserService;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
+import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.internal.verification.VerificationModeFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
-import org.springframework.data.web.PagedResourcesAssembler;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
-import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 
 import java.time.ZonedDateTime;
 import java.util.Arrays;
@@ -28,21 +25,24 @@ import static org.mockito.BDDMockito.given;
 import static org.hamcrest.CoreMatchers.is;
 import static org.mockito.Mockito.reset;
 import static org.mockito.Mockito.verify;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-@WebMvcTest(UserController.class)
-public class UserControllerTest {
+@WebMvcTest({UserController.class, UserResponseModelAssembler.class})
+final class UserControllerTest {
 
     @Autowired
     private MockMvc mvc;
 
-    @MockBean
-    private PagedResourcesAssembler pagedResourcesAssembler;
-
-    @MockBean
-    private UserResponseModelAssembler userResponseModelAssembler;// = new UserResponseModelAssembler(UserController.class, EntityModel<UserResponse>);
+    @Autowired
+    private static UserResponseModelAssembler userResponseModelAssembler;
 
     @MockBean
     private UserService userService;
+
+    @Mock
+    private Page<User> userPage;
 
     private static final String BASE_URL = "http://localhost";
 
@@ -52,20 +52,10 @@ public class UserControllerTest {
 
     private static final String USER_URL = BASE_URL + "/api/" + VERSION + USER_PATH + "/";
 
-    @BeforeAll
-    public static void setUp() {
-//        userResponseModelAssembler = new UserResponseModelAssembler(UserController.class, null);
-    }
     @Test
     public void whenPassCorrectParametersToCreateUserShouldReturnUserAndLinksToNewUser() throws Exception {
 
-        final var dateNow = ZonedDateTime.now();
-        final var uuid = UUID.randomUUID().toString();
-        final var user = User.builder().
-                name("A").
-                description("DescA").
-                id(uuid).
-                created(dateNow).build();
+        final var user = userFactory("A");
 
         given(userService.save(Mockito.any())).willReturn(user);
 
@@ -75,13 +65,13 @@ public class UserControllerTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .accept(MediaType.APPLICATION_JSON));
         result
-                .andExpect(MockMvcResultMatchers.status().isCreated())
-                .andExpect(MockMvcResultMatchers.jsonPath("$.name", is("A")))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.id", is(uuid)))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.description", is("DescA")))
-                .andExpect(MockMvcResultMatchers.header().string("Location", USER_URL + uuid))
-                .andExpect(MockMvcResultMatchers.jsonPath("_links.self.href", is(USER_URL + uuid)))
-                .andExpect(MockMvcResultMatchers.jsonPath("_links.delete.href", is(USER_URL + uuid)));
+                .andExpect(status().isCreated())
+                .andExpect(jsonPath("name", is(user.getName())))
+                .andExpect(jsonPath("id", is(user.getId())))
+                .andExpect(jsonPath("description", is(user.getDescription())))
+                .andExpect(header().string("Location", USER_URL + user.getId()))
+                .andExpect(jsonPath("_links.self.href", is(USER_URL + user.getId())))
+                .andExpect(jsonPath("_links.delete.href", is(USER_URL + user.getId())));
 
         verify(userService, VerificationModeFactory.times(1)).save(Mockito.any());
         reset(userService);
@@ -90,73 +80,67 @@ public class UserControllerTest {
     @Test
     public void whenTryToGetASpecificUSerByIdShouldReturnUserAndLinksToThatUser() throws Exception {
 
-        final var dateNow = ZonedDateTime.now();
-        final var uuid = UUID.randomUUID().toString();
-        final var user = User.builder().
-                name("A").
-                description("DescA").
-                id(uuid).
-                created(dateNow).build();
+        final var user = userFactory("A");
 
-        given(userService.findById(uuid)).willReturn(user);
+        given(userService.findById(user.getId())).willReturn(user);
 
         final var result = mvc.perform( MockMvcRequestBuilders
-                .get("/api/v1/users/" + uuid)
+                .get("/api/v1/users/" + user.getId())
                 .contentType(MediaType.APPLICATION_JSON)
                 .accept(MediaType.APPLICATION_JSON));
         result
-                .andExpect(MockMvcResultMatchers.status().isOk())
-                .andExpect(MockMvcResultMatchers.jsonPath("$.name", is("A")))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.id", is(uuid)))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.description", is("DescA")))
-                .andExpect(MockMvcResultMatchers.jsonPath("_links.self.href", is(USER_URL + uuid)))
-                .andExpect(MockMvcResultMatchers.jsonPath("_links.delete.href", is(USER_URL + uuid)));
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("name", is(user.getName())))
+                .andExpect(jsonPath("id", is(user.getId())))
+                .andExpect(jsonPath("description", is(user.getDescription())))
+                .andExpect(jsonPath("_links.self.href", is(USER_URL + user.getId())))
+                .andExpect(jsonPath("_links.delete.href", is(USER_URL + user.getId())));
 
-        verify(userService, VerificationModeFactory.times(1)).findById(uuid);
+        verify(userService, VerificationModeFactory.times(1)).findById(user.getId());
         reset(userService);
     }
 
+    @Test
     public void whenTryToFetchAllUsersShouldReturnListOfUsersAndLinksToThatUser() throws Exception {
+        final var userB = userFactory("B");
+        final var userList = Arrays.asList(new User[]{userB});
 
-        final var dateNowA = ZonedDateTime.now();
-        final var uuidA = UUID.randomUUID().toString();
-        final var userA = User.builder().
-                name("A").
-                description("DescA").
-                id(uuidA).
-                created(dateNowA).build();
-
-        final var dateNowB = ZonedDateTime.now();
-        final var uuidB = UUID.randomUUID().toString();
-        final var userB = User.builder().
-                name("B").
-                description("DescB").
-                id(uuidB).
-                created(dateNowB).build();
-
-        final var userList = Arrays.asList(new User[]{userA, userB});
-        Page<User> page = new PageImpl<>(userList);
-
-        given(userService.fetchAll(Mockito.any(), Mockito.anyInt())).willReturn(page);
-        //given(userResponseModelAssembler.toModel(Mockito.any(), Mockito.anyInt())).willReturn(page);
+        given(userPage.get()).willReturn(userList.stream());
+        given(userPage.getTotalElements()).willReturn(4l);
+        given(userService.fetchAll(Mockito.any())).willReturn(userPage);
 
         final var result = mvc.perform( MockMvcRequestBuilders
-                .get("/api/v1/users")
+                .get("/api/v1/users?page=1&size=1")
                 .contentType(MediaType.APPLICATION_JSON)
                 .accept(MediaType.APPLICATION_JSON));
         result
-                .andExpect(MockMvcResultMatchers.status().isOk())
-                .andExpect(MockMvcResultMatchers.jsonPath("$.name", is("A")))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.id", is(uuidA)))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.description", is("DescA")))
-                .andExpect(MockMvcResultMatchers.jsonPath("_links.self.href", is(USER_URL + uuidA)))
-                .andExpect(MockMvcResultMatchers.jsonPath("_links.delete.href", is(USER_URL + uuidA)));
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("_embedded.userResponseModelList[0].name", is(userB.getName())))
+                .andExpect(jsonPath("_embedded.userResponseModelList[0].id", is(userB.getId())))
+                .andExpect(jsonPath("_embedded.userResponseModelList[0].description", is(userB.getDescription())))
+                .andExpect(jsonPath("_links.first.href", is("http://localhost/api/v1/users?page=0&size=1")))
+                .andExpect(jsonPath("_links.prev.href", is("http://localhost/api/v1/users?page=0&size=1")))
+                .andExpect(jsonPath("_links.self.href", is("http://localhost/api/v1/users?page=1&size=1")))
+                .andExpect(jsonPath("_links.next.href", is("http://localhost/api/v1/users?page=2&size=1")))
+                .andExpect(jsonPath("_links.last.href", is("http://localhost/api/v1/users?page=3&size=1")));
 
-        verify(userService, VerificationModeFactory.times(1)).fetchAll(Mockito.any(), Mockito.any());
+        verify(userPage, VerificationModeFactory.times(1)).get();
+        verify(userPage, VerificationModeFactory.times(1)).getTotalElements();
+        verify(userService, VerificationModeFactory.times(1)).fetchAll(Mockito.any());
         reset(userService);
     }
 
-    public static String asJsonString(final Object obj) {
+    private User userFactory(String increment) {
+        final var user = User.builder().
+                name(increment).
+                description("Desc".concat(increment)).
+                id(UUID.randomUUID().toString()).
+                created(ZonedDateTime.now()).build();
+
+        return user;
+    }
+
+    private static String asJsonString(final Object obj) {
         try {
             return new ObjectMapper().writeValueAsString(obj);
         } catch (Exception e) {
