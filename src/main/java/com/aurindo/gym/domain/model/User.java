@@ -1,9 +1,11 @@
 package com.aurindo.gym.domain.model;
 
-
 import jakarta.persistence.*;
 import lombok.*;
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
+import java.time.LocalDateTime;
 import java.time.ZonedDateTime;
 
 @Builder
@@ -12,6 +14,7 @@ import java.time.ZonedDateTime;
 @Entity(name = "userr")
 @NoArgsConstructor
 @AllArgsConstructor
+@EntityListeners(AuditingEntityListener.class)
 public class User {
 
     @Id
@@ -19,6 +22,9 @@ public class User {
     private String id;
     private String name;
     private String description;
+
+    @CreatedDate
+    @Column(nullable = false, updatable = false)
     private ZonedDateTime created;
 
 }

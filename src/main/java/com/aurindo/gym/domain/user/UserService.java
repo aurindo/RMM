@@ -9,7 +9,7 @@ public interface UserService {
 
     User findById(final String id);
 
-    Page<User> fetchAll(final Pageable pageable, final int pageLimitHome);
+    Page<User> fetchAll(final Pageable pageable);
 
     void delete(final String id);
 
