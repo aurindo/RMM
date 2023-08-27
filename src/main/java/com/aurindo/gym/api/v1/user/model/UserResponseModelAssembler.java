@@ -12,8 +12,8 @@ public class UserResponseModelAssembler extends RepresentationModelAssemblerSupp
     }
 
     @Override
-    public UserResponseModel toModel(UserResponse entity) {
-        UserResponseModel model = new UserResponseModel();
+    public UserResponseModel toModel(final UserResponse entity) {
+        final UserResponseModel model = new UserResponseModel();
         BeanUtils.copyProperties(entity, model);
 //        entity.getLinks().stream().forEach(link -> model.add(link));
         return model;
