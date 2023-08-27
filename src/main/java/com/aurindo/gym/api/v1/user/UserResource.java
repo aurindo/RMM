@@ -2,7 +2,6 @@ package com.aurindo.gym.api.v1.user;
 
 import com.aurindo.gym.api.v1.user.model.UserResponse;
 import com.aurindo.gym.api.v1.user.model.UserRequest;
-import com.aurindo.gym.api.v1.user.model.UserResponseModel;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
@@ -18,7 +17,7 @@ public interface UserResource {
             consumes = MediaType.APPLICATION_JSON_VALUE,
             produces = MediaType.APPLICATION_JSON_VALUE
     )
-    PagedModel<UserResponseModel> fetchAll(
+    ResponseEntity<PagedModel<UserResponse>> fetchAll(
             @RequestParam(required = false, defaultValue = "0") @Min(0) int page,
             @RequestParam(required = false, defaultValue = "10") @Min(1) @Max(50) int size
     );

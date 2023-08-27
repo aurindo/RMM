@@ -13,6 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
@@ -105,8 +106,16 @@ final class UserControllerTest {
         final var userB = userFactory("B");
         final var userList = Arrays.asList(new User[]{userB});
 
-        given(userPage.get()).willReturn(userList.stream());
+//        given(userPage.get()).willReturn(userList.stream());
+        given(userPage.iterator()).willReturn(userList.iterator());
         given(userPage.getTotalElements()).willReturn(4l);
+        given(userPage.getSize()).willReturn(1);
+        given(userPage.getNumber()).willReturn(1);
+        given(userPage.getTotalPages()).willReturn(4);
+        given(userPage.hasPrevious()).willReturn(true);
+        given(userPage.hasNext()).willReturn(true);
+        given(userPage.getSort()).willReturn(Sort.unsorted());
+
         given(userService.fetchAll(Mockito.any())).willReturn(userPage);
 
         final var result = mvc.perform( MockMvcRequestBuilders
@@ -115,17 +124,27 @@ final class UserControllerTest {
                 .accept(MediaType.APPLICATION_JSON));
         result
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("_embedded.userResponseModelList[0].name", is(userB.getName())))
-                .andExpect(jsonPath("_embedded.userResponseModelList[0].id", is(userB.getId())))
-                .andExpect(jsonPath("_embedded.userResponseModelList[0].description", is(userB.getDescription())))
+                .andExpect(jsonPath("_embedded.userResponseList[0].name", is(userB.getName())))
+                .andExpect(jsonPath("_embedded.userResponseList[0].id", is(userB.getId())))
+                .andExpect(jsonPath("_embedded.userResponseList[0].description", is(userB.getDescription())))
+                .andExpect(jsonPath("_embedded.userResponseList[0]._links.self.href", is("http://localhost/api/v1/users/" + userB.getId())))
+                .andExpect(jsonPath("_embedded.userResponseList[0]._links.delete.href", is("http://localhost/api/v1/users/" + userB.getId())))
                 .andExpect(jsonPath("_links.first.href", is("http://localhost/api/v1/users?page=0&size=1")))
-                .andExpect(jsonPath("_links.prev.href", is("http://localhost/api/v1/users?page=0&size=1")))
                 .andExpect(jsonPath("_links.self.href", is("http://localhost/api/v1/users?page=1&size=1")))
-                .andExpect(jsonPath("_links.next.href", is("http://localhost/api/v1/users?page=2&size=1")))
-                .andExpect(jsonPath("_links.last.href", is("http://localhost/api/v1/users?page=3&size=1")));
+                .andExpect(jsonPath("_links.last.href", is("http://localhost/api/v1/users?page=3&size=1")))
+                .andExpect(jsonPath("page.size", is(1)))
+                .andExpect(jsonPath("page.totalElements", is(4)))
+                .andExpect(jsonPath("page.totalPages", is(4)))
+                .andExpect(jsonPath("page.number", is(1)));
 
-        verify(userPage, VerificationModeFactory.times(1)).get();
         verify(userPage, VerificationModeFactory.times(1)).getTotalElements();
+        verify(userPage, VerificationModeFactory.times(3)).getSize();
+        verify(userPage, VerificationModeFactory.times(2)).getSort();
+        verify(userPage, VerificationModeFactory.times(1)).iterator();
+        verify(userPage, VerificationModeFactory.times(1)).getNumber();
+        verify(userPage, VerificationModeFactory.times(3)).getTotalPages();
+        verify(userPage, VerificationModeFactory.times(2)).hasPrevious();
+        verify(userPage, VerificationModeFactory.times(1)).hasNext();
         verify(userService, VerificationModeFactory.times(1)).fetchAll(Mockito.any());
         reset(userService);
     }

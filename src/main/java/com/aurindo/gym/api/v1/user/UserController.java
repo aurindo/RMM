@@ -2,29 +2,25 @@ package com.aurindo.gym.api.v1.user;
 
 import com.aurindo.gym.api.v1.user.model.UserRequest;
 import com.aurindo.gym.api.v1.user.model.UserResponse;
-import com.aurindo.gym.api.v1.user.model.UserResponseModel;
 import com.aurindo.gym.api.v1.user.model.UserResponseModelAssembler;
 import com.aurindo.gym.domain.model.User;
 import com.aurindo.gym.domain.user.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PagedResourcesAssembler;
 import org.springframework.hateoas.MediaTypes;
 import org.springframework.hateoas.PagedModel;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.net.URI;
-import java.util.List;
-import java.util.stream.Collectors;
 
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 
-//@AllArgsConstructor
 @RestController
 public class UserController implements UserResource {
 
@@ -32,7 +28,7 @@ public class UserController implements UserResource {
     private UserResponseModelAssembler userResponseModelAssembler;
 
     @Autowired
-    private PagedResourcesAssembler<UserResponse> pagedResourcesAssembler;
+    private PagedResourcesAssembler<User> pagedResourcesAssembler;
 
     @Autowired
     private UserService userService;
@@ -63,27 +59,17 @@ public class UserController implements UserResource {
     }
 
     @Override
-    public PagedModel<UserResponseModel> fetchAll(
+    public ResponseEntity<PagedModel<UserResponse>> fetchAll(
             final int page,
             final int size
     ) {
         final Pageable pageable = PageRequest.of(page, size);
-        final Page<User> pageUser = userService.fetchAll(pageable);
+        final Page<User> userEntities = userService.fetchAll(pageable);
 
-        final Page<UserResponse> userResponsePage = mountPage(pageable, pageUser);
+        final PagedModel<UserResponse> pagedModel = pagedResourcesAssembler
+                .toModel(userEntities, userResponseModelAssembler);
 
-        return pagedResourcesAssembler.toModel(userResponsePage, userResponseModelAssembler);
-    }
-
-    private Page<UserResponse> mountPage(
-            final Pageable pageable,
-            final Page<User> page) {
-        final List<UserResponse> responseList = page.get().map(
-                user -> UserResponse.fromUser(user)).collect(Collectors.toList());
-
-            final Page<UserResponse> responsePage =
-                new PageImpl<>(responseList, pageable, page.getTotalElements());
-        return responsePage;
+        return new ResponseEntity<>(pagedModel, HttpStatus.OK);
     }
 
     @Override
@@ -98,8 +84,8 @@ public class UserController implements UserResource {
 
     @Override
     public ResponseEntity<UserResponse> update(
-            UserRequest updateRequest,
-            String id
+            final UserRequest updateRequest,
+            final String id
     ) {
 
         final User user = updateRequest.toUser();
