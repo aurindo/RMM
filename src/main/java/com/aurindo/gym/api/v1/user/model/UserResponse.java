@@ -6,7 +6,7 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.*;
 import org.springframework.hateoas.RepresentationModel;
 
-import java.time.ZonedDateTime;
+import java.util.Date;
 
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
@@ -24,7 +24,7 @@ public class UserResponse extends RepresentationModel<UserResponse> {
     private String description;
 
     @JsonFormat(shape= JsonFormat.Shape.STRING, pattern="yyyy-MM-dd'T'HH:mm:ss.SSSZ")
-    private ZonedDateTime created;
+    private Date created;
 
     public static UserResponse fromUser(final User user) {
         final UserResponse userResponse = UserResponse.builder().

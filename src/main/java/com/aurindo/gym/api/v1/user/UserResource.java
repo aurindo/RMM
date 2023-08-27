@@ -17,7 +17,7 @@ public interface UserResource {
             produces = MediaType.APPLICATION_JSON_VALUE
     )
     ResponseEntity<PagedModel<UserResponse>> fetchAll(
-            final Pageable pageable
+            Pageable pageable
     );
 
     @PostMapping(

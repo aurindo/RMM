@@ -1,13 +1,11 @@
 package com.aurindo.gym.api.v1.user.model;
 
 import com.aurindo.gym.domain.model.User;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.EqualsAndHashCode;
-import lombok.Getter;
+import lombok.*;
 
 @EqualsAndHashCode
 @Getter
+@Setter
 @Builder
 @AllArgsConstructor
 public class UserRequest {
