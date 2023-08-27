@@ -5,6 +5,7 @@ import com.aurindo.gym.api.v1.user.model.UserRequest;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
+import org.springframework.data.domain.Pageable;
 import org.springframework.hateoas.PagedModel;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -18,8 +19,7 @@ public interface UserResource {
             produces = MediaType.APPLICATION_JSON_VALUE
     )
     ResponseEntity<PagedModel<UserResponse>> fetchAll(
-            @RequestParam(required = false, defaultValue = "0") @Min(0) int page,
-            @RequestParam(required = false, defaultValue = "10") @Min(1) @Max(50) int size
+            final Pageable pageable
     );
 
     @PostMapping(

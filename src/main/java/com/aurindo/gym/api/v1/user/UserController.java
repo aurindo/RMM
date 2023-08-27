@@ -60,10 +60,9 @@ public class UserController implements UserResource {
 
     @Override
     public ResponseEntity<PagedModel<UserResponse>> fetchAll(
-            final int page,
-            final int size
+            final Pageable pageable
     ) {
-        final Pageable pageable = PageRequest.of(page, size);
+//        final Pageable pageable = PageRequest.of(page, size);
         final Page<User> userEntities = userService.fetchAll(pageable);
 
         final PagedModel<UserResponse> pagedModel = pagedResourcesAssembler
