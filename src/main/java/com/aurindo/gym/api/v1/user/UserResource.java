@@ -3,8 +3,6 @@ package com.aurindo.gym.api.v1.user;
 import com.aurindo.gym.api.v1.user.model.UserResponse;
 import com.aurindo.gym.api.v1.user.model.UserRequest;
 import jakarta.validation.Valid;
-import jakarta.validation.constraints.Max;
-import jakarta.validation.constraints.Min;
 import org.springframework.data.domain.Pageable;
 import org.springframework.hateoas.PagedModel;
 import org.springframework.http.MediaType;
