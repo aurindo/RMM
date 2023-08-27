@@ -20,6 +20,7 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
 import java.time.ZonedDateTime;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.UUID;
 
 import static org.mockito.BDDMockito.given;
@@ -154,7 +155,7 @@ final class UserControllerTest {
                 name(increment).
                 description("Desc".concat(increment)).
                 id(UUID.randomUUID().toString()).
-                created(ZonedDateTime.now()).build();
+                created(new Date()).build();
 
         return user;
     }
