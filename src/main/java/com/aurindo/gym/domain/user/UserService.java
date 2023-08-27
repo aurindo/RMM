@@ -5,13 +5,13 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
 public interface UserService {
-    User save(User user);
+    User save(final User user);
 
-    User findById(String id);
+    User findById(final String id);
 
-    Page<User> fetchAll(Pageable pageable, int pageLimitHome);
+    Page<User> fetchAll(final Pageable pageable);
 
-    void delete(String id);
+    void delete(final String id);
 
-    User update(User user);
+    User update(final User user);
 }

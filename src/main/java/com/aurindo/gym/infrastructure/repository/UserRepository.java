@@ -11,5 +11,4 @@ public interface UserRepository extends CrudRepository<User, String> {
 
     Page<User> findAllByOrderByNameAsc(Pageable pageable);
 
-
 }
