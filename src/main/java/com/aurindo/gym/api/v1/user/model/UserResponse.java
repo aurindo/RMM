@@ -2,13 +2,10 @@ package com.aurindo.gym.api.v1.user.model;
 
 import com.aurindo.gym.api.v1.user.UserController;
 import com.aurindo.gym.domain.model.User;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.EqualsAndHashCode;
-import lombok.Getter;
+import com.fasterxml.jackson.annotation.JsonFormat;
+import lombok.*;
 import org.springframework.hateoas.RepresentationModel;
 
-import java.time.LocalDateTime;
 import java.time.ZonedDateTime;
 
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
@@ -16,17 +13,21 @@ import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 
 @EqualsAndHashCode(callSuper=false)
 @Getter
+@Setter
 @Builder
 @AllArgsConstructor
+@NoArgsConstructor
 public class UserResponse extends RepresentationModel<UserResponse> {
 
     private String id;
     private String name;
     private String description;
+
+    @JsonFormat(shape= JsonFormat.Shape.STRING, pattern="yyyy-MM-dd'T'HH:mm:ss.SSSZ")
     private ZonedDateTime created;
 
-    public static UserResponse fromUser(User user) {
-        UserResponse userResponse = UserResponse.builder().
+    public static UserResponse fromUser(final User user) {
+        final UserResponse userResponse = UserResponse.builder().
                 name(user.getName()).
                 description(user.getDescription()).
                 created(user.getCreated()).

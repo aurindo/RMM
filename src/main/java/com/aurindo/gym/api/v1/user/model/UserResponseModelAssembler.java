@@ -1,21 +1,28 @@
 package com.aurindo.gym.api.v1.user.model;
 
+import com.aurindo.gym.api.v1.user.UserController;
+import com.aurindo.gym.domain.model.User;
 import org.springframework.beans.BeanUtils;
 import org.springframework.hateoas.server.mvc.RepresentationModelAssemblerSupport;
 import org.springframework.stereotype.Component;
 
+import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
+import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
+
 @Component
-public class UserResponseModelAssembler extends RepresentationModelAssemblerSupport<UserResponse, UserResponseModel> {
+public class UserResponseModelAssembler extends RepresentationModelAssemblerSupport<User, UserResponse> {
 
     public UserResponseModelAssembler() {
-        super(UserResponse.class, UserResponseModel.class);
+        super(UserController.class, UserResponse.class);
     }
 
     @Override
-    public UserResponseModel toModel(final UserResponse entity) {
-        final UserResponseModel model = new UserResponseModel();
+    public UserResponse toModel(final User entity)
+    {
+        final UserResponse model = new UserResponse();
         BeanUtils.copyProperties(entity, model);
-//        entity.getLinks().stream().forEach(link -> model.add(link));
+        model.add(linkTo(methodOn(UserController.class).getById(entity.getId())).withSelfRel());
+        model.add(linkTo(methodOn(UserController.class).delete(entity.getId())).withRel("delete"));
         return model;
     }
 
