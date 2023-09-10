@@ -3,6 +3,7 @@ package com.aurindo.gym.api.v1.user;
 import com.aurindo.gym.api.v1.user.model.UserResponse;
 import com.aurindo.gym.api.v1.user.model.UserRequest;
 import com.aurindo.gym.infrastructure.exception.BaseException;
+import com.aurindo.gym.infrastructure.exception.EntityNotFoundException;
 import jakarta.validation.Valid;
 import org.springframework.data.domain.Pageable;
 import org.springframework.hateoas.PagedModel;
@@ -44,7 +45,7 @@ public interface UserResource {
             produces = MediaType.APPLICATION_JSON_VALUE
     )
     ResponseEntity<?> delete(
-            @PathVariable(value = "userId") String userId);
+            @PathVariable(value = "userId") String userId) throws BaseException;
 
     @PutMapping(
             value = ROUTE + "/{userId}",

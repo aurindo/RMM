@@ -1,8 +1,6 @@
 package com.aurindo.gym.infrastructure.exception;
 
-import lombok.Data;
-
-public class BaseException extends RuntimeException {
+public class BaseException extends Exception {
 
     public BaseException(String message) {
         super(message);

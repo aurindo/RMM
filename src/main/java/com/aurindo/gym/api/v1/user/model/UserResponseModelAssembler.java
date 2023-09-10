@@ -27,7 +27,11 @@ public class UserResponseModelAssembler extends RepresentationModelAssemblerSupp
         } catch (BaseException e) {
             throw new RuntimeException(e);
         }
-        model.add(linkTo(methodOn(UserController.class).delete(entity.getId())).withRel("delete"));
+        try {
+            model.add(linkTo(methodOn(UserController.class).delete(entity.getId())).withRel("delete"));
+        } catch (BaseException e) {
+            throw new RuntimeException(e);
+        }
         return model;
     }
 

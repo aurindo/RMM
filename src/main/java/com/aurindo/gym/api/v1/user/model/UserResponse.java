@@ -4,14 +4,11 @@ import com.aurindo.gym.api.v1.user.UserController;
 import com.aurindo.gym.domain.model.User;
 import com.aurindo.gym.domain.util.DateUtil;
 import com.aurindo.gym.infrastructure.exception.BaseException;
-import com.aurindo.gym.infrastructure.exception.EntityNotFoundException;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.*;
 import org.springframework.hateoas.RepresentationModel;
 
-import java.time.ZoneId;
 import java.time.ZonedDateTime;
-import java.util.Date;
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 

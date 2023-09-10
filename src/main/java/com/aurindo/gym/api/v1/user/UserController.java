@@ -70,7 +70,7 @@ public class UserController implements UserResource {
     @Override
     public ResponseEntity<?> delete(
             final String id
-    ) {
+    ) throws BaseException {
 
         userService.delete(id);
 

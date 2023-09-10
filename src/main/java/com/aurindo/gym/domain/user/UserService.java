@@ -12,7 +12,7 @@ public interface UserService {
 
     Page<User> fetchAll(Pageable pageable);
 
-    void delete(String id);
+    void delete(String id) throws EntityNotFoundException;
 
-    User update(User user);
+    User update(User user) throws EntityNotFoundException;
 }

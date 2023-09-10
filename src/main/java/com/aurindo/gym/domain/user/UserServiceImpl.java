@@ -9,8 +9,6 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
-import java.util.Optional;
-
 @AllArgsConstructor
 @Service
 public class UserServiceImpl implements UserService {
@@ -37,21 +35,20 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public void delete(final String userId) {
-        userRepository.findById(userId).ifPresent(
-                user -> userRepository.delete(user));
+        userRepository.findById(userId).ifPresentOrElse(
+                user -> userRepository.delete(user),
+                () -> new EntityNotFoundException(User.class, userId));
     }
 
     @Override
     public User update(final User user) {
-        final Optional<User> optionalUser = userRepository.findById(user.getId());
-
-        if (optionalUser.isPresent()) {
-            user.setCreated(optionalUser.get().getCreated());
-            userRepository.save(user);
-        } else {
-            throw new RuntimeException();
-        }
-
+        userRepository.findById(user.getId()).ifPresentOrElse(
+                optionalUser ->
+                    {
+                        user.setCreated(optionalUser.getCreated());
+                        userRepository.save(user);
+                    },
+                () -> new EntityNotFoundException(User.class, user.getId()));
         return user;
     }
 }
