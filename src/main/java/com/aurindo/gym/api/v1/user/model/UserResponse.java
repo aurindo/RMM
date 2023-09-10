@@ -9,8 +9,9 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.*;
 import org.springframework.hateoas.RepresentationModel;
 
+import java.time.ZoneId;
 import java.time.ZonedDateTime;
-
+import java.util.Date;
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 
@@ -33,7 +34,7 @@ public class UserResponse extends RepresentationModel<UserResponse> {
         final UserResponse userResponse = UserResponse.builder().
                 name(user.getName()).
                 description(user.getDescription()).
-                created(user.getCreated()).
+                created(DateUtil.dateToZonedDateTime(user.getCreated())).
                 id(user.getId()).build();
 
         userResponse.add(linkTo(methodOn(UserController.class).getById(user.getId())).withSelfRel());

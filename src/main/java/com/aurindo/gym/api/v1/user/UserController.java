@@ -18,9 +18,6 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.net.URI;
 
-import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
-import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
-
 @RestController
 public class UserController implements UserResource {
 
@@ -37,7 +34,7 @@ public class UserController implements UserResource {
     public ResponseEntity<UserResponse> create(
             final UserRequest createRequest
     ) throws BaseException {
-        final User user = createRequest.toUser();
+        final User user = new User(createRequest.name(), createRequest.description());
         final User userCreated = userService.save(user);
         final UserResponse userResponse = UserResponse.fromUser(userCreated);
 
@@ -85,18 +82,13 @@ public class UserController implements UserResource {
             final UserRequest updateRequest,
             final String id
     ) throws BaseException {
-
-        final User user = updateRequest.toUser();
+        final User user = new User(updateRequest.name(), updateRequest.description());
         user.setId(id);
 
         final User userUpdated = userService.update(user);
 
         final UserResponse userResponse = UserResponse.fromUser(userUpdated);
 
-        userResponse.add(linkTo(methodOn(UserController.class).getById(userUpdated.getId())).withSelfRel());
-        userResponse.add(linkTo(methodOn(UserController.class).delete(userUpdated.getId())).withRel("delete"));
-
         return ResponseEntity.ok().contentType(MediaTypes.HAL_JSON).body(userResponse);
     }
-
 }

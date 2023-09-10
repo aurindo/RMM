@@ -20,7 +20,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public Page<User> fetchAll(final Pageable pageable) {
-        return userSearchRepository.findAllByOrderByNameAsc(pageable);
+        return userSearchRepository.findAll(pageable);
     }
 
     @Override

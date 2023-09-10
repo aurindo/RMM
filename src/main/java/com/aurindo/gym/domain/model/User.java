@@ -5,7 +5,7 @@ import jakarta.validation.constraints.NotEmpty;
 import lombok.*;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
-import java.time.ZonedDateTime;
+import java.util.Date;
 
 @Builder
 @Getter
@@ -15,6 +15,11 @@ import java.time.ZonedDateTime;
 @AllArgsConstructor
 @EntityListeners(AuditingEntityListener.class)
 public class User {
+
+    public User(String name, String description) {
+        this.name = name;
+        this.description = description;
+    }
 
     @Id
     @GeneratedValue(strategy= GenerationType.UUID)
@@ -29,6 +34,6 @@ public class User {
     @NotEmpty
     @CreatedDate
     @Column(nullable = false, updatable = false)
-    private ZonedDateTime created;
+    private Date created;
 
 }
