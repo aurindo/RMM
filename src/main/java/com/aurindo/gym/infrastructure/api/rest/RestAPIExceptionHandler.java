@@ -7,7 +7,7 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 
-import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -18,7 +18,7 @@ public class RestAPIExceptionHandler extends ResponseEntityExceptionHandler {
     public ResponseEntity<Object> handleMyException(EntityNotFoundException ex) {
 
         RestAPIError err = new RestAPIError(
-                LocalDateTime.now(),
+                ZonedDateTime.now(),
                 HttpStatus.NOT_FOUND,
                 ex.getMessage() ,
                 null);
@@ -34,7 +34,7 @@ public class RestAPIExceptionHandler extends ResponseEntityExceptionHandler {
         details.add(ex.getMessage());
 
         RestAPIError err = new RestAPIError(
-                LocalDateTime.now(),
+                ZonedDateTime.now(),
                 HttpStatus.INTERNAL_SERVER_ERROR,
                 HttpStatus.INTERNAL_SERVER_ERROR.getReasonPhrase() ,
                 details);

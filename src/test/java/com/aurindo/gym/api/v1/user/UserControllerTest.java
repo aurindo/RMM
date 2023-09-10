@@ -4,6 +4,8 @@ import com.aurindo.gym.api.v1.user.model.UserRequest;
 import com.aurindo.gym.api.v1.user.model.UserResponseModelAssembler;
 import com.aurindo.gym.domain.model.User;
 import com.aurindo.gym.domain.user.UserService;
+import com.aurindo.gym.infrastructure.api.rest.RestAPIExceptionHandler;
+import com.aurindo.gym.infrastructure.exception.EntityNotFoundException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
@@ -24,13 +26,12 @@ import java.util.UUID;
 
 import static org.mockito.BDDMockito.given;
 import static org.hamcrest.CoreMatchers.is;
-import static org.mockito.Mockito.reset;
-import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-@WebMvcTest({UserController.class, UserResponseModelAssembler.class})
+@WebMvcTest({UserController.class, UserResponseModelAssembler.class, RestAPIExceptionHandler.class})
 final class UserControllerTest {
 
     @Autowired
@@ -102,11 +103,30 @@ final class UserControllerTest {
     }
 
     @Test
+    public void whenTryToGetASpecificUSerUsingUnknowingIdShouldReturnAnError() throws Exception {
+
+        final var unknowingId = "UnknowingId";
+
+        given(userService.findById(unknowingId)).willThrow(new EntityNotFoundException(User.class, unknowingId));
+
+        final var result = mvc.perform( MockMvcRequestBuilders
+                .get("/api/v1/users/" + unknowingId)
+                .contentType(MediaType.APPLICATION_JSON)
+                .accept(MediaType.APPLICATION_JSON));
+        result
+                .andExpect(status().is(404))
+                .andExpect(jsonPath("status", is("NOT_FOUND")))
+                .andExpect(jsonPath("message", is("User not found. Parameters: " + unknowingId)));
+
+        verify(userService, VerificationModeFactory.times(1)).findById(unknowingId);
+        reset(userService);
+    }
+
+    @Test
     public void whenTryToFetchAllUsersShouldReturnListOfUsersAndLinksToThatUser() throws Exception {
         final var userB = userFactory("B");
         final var userList = Arrays.asList(new User[]{userB});
 
-//        given(userPage.get()).willReturn(userList.stream());
         given(userPage.iterator()).willReturn(userList.iterator());
         given(userPage.getTotalElements()).willReturn(4l);
         given(userPage.getSize()).willReturn(1);
@@ -146,6 +166,40 @@ final class UserControllerTest {
         verify(userPage, VerificationModeFactory.times(2)).hasPrevious();
         verify(userPage, VerificationModeFactory.times(1)).hasNext();
         verify(userService, VerificationModeFactory.times(1)).fetchAll(Mockito.any());
+        reset(userService);
+    }
+
+    @Test
+    public void whenTryToDeleteASpecificUSerByIdShouldReturnNoContent() throws Exception {
+
+        final var userID = "any_id";
+
+        final var result = mvc.perform( MockMvcRequestBuilders
+                .delete("/api/v1/users/" + userID)
+                .contentType(MediaType.APPLICATION_JSON)
+                .accept(MediaType.APPLICATION_JSON));
+        result
+                .andExpect(status().isNoContent());
+
+        reset(userService);
+    }
+
+    @Test
+    public void whenTryToDeleteASpecificUserUsingUnknowingIdShouldReturnAnError() throws Exception {
+
+        final var unknowingId = "UnknowingId";
+        doThrow(new EntityNotFoundException(User.class, unknowingId)).when(userService).delete(unknowingId);
+
+        final var result = mvc.perform( MockMvcRequestBuilders
+                .delete("/api/v1/users/" + unknowingId)
+                .contentType(MediaType.APPLICATION_JSON)
+                .accept(MediaType.APPLICATION_JSON));
+        result
+                .andExpect(status().is(404))
+                .andExpect(jsonPath("status", is("NOT_FOUND")))
+                .andExpect(jsonPath("message", is("User not found. Parameters: " + unknowingId)));
+
+        verify(userService, VerificationModeFactory.times(1)).delete(unknowingId);
         reset(userService);
     }
 
