@@ -105,7 +105,6 @@ final class UserControllerTest {
     public void whenTryToFetchAllUsersShouldReturnListOfUsersAndLinksToThatUser() throws Exception {
         final var userB = userFactory("B");
         final var userList = Arrays.asList(new User[]{userB});
-
         given(userPage.iterator()).willReturn(userList.iterator());
         given(userPage.getTotalElements()).willReturn(4l);
         given(userPage.getSize()).willReturn(1);
