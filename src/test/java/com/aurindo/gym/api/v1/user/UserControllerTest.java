@@ -18,8 +18,8 @@ import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
-import java.time.ZonedDateTime;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.UUID;
 
 import static org.mockito.BDDMockito.given;
@@ -62,7 +62,7 @@ final class UserControllerTest {
 
         final var result = mvc.perform( MockMvcRequestBuilders
                         .post("/api/v1/users")
-                        .content(asJsonString(UserRequest.builder().name("A").description("DescA").build()))
+                        .content(asJsonString(new UserRequest(null,"A", "DescA")))
                         .contentType(MediaType.APPLICATION_JSON)
                         .accept(MediaType.APPLICATION_JSON));
         result
@@ -105,8 +105,6 @@ final class UserControllerTest {
     public void whenTryToFetchAllUsersShouldReturnListOfUsersAndLinksToThatUser() throws Exception {
         final var userB = userFactory("B");
         final var userList = Arrays.asList(new User[]{userB});
-
-//        given(userPage.get()).willReturn(userList.stream());
         given(userPage.iterator()).willReturn(userList.iterator());
         given(userPage.getTotalElements()).willReturn(4l);
         given(userPage.getSize()).willReturn(1);
@@ -154,8 +152,7 @@ final class UserControllerTest {
                 name(increment).
                 description("Desc".concat(increment)).
                 id(UUID.randomUUID().toString()).
-                created(ZonedDateTime.now()).build();
-
+                created(new Date()).build();
         return user;
     }
 

@@ -8,19 +8,21 @@ import org.springframework.hateoas.PagedModel;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
-@RequestMapping(value = "/api/v1/users")
 public interface UserResource {
 
+    String ROUTE = "/api/v1/users";
+
     @GetMapping(
+            value = ROUTE,
             consumes = MediaType.APPLICATION_JSON_VALUE,
             produces = MediaType.APPLICATION_JSON_VALUE
     )
     ResponseEntity<PagedModel<UserResponse>> fetchAll(
-            final Pageable pageable
+            Pageable pageable
     );
 
     @PostMapping(
+            value = ROUTE,
             consumes = MediaType.APPLICATION_JSON_VALUE,
             produces = MediaType.APPLICATION_JSON_VALUE
     )
@@ -28,7 +30,7 @@ public interface UserResource {
             @Valid @RequestBody UserRequest userRequest);
 
     @GetMapping(
-            value = "/{userId}",
+            value = ROUTE + "/{userId}",
             consumes = MediaType.APPLICATION_JSON_VALUE,
             produces = MediaType.APPLICATION_JSON_VALUE
     )
@@ -36,7 +38,7 @@ public interface UserResource {
             @PathVariable(value = "userId") String userId);
 
     @DeleteMapping(
-            value = "/{userId}",
+            value = ROUTE + "/{userId}",
             consumes = MediaType.APPLICATION_JSON_VALUE,
             produces = MediaType.APPLICATION_JSON_VALUE
     )
@@ -44,12 +46,11 @@ public interface UserResource {
             @PathVariable(value = "userId") String userId);
 
     @PutMapping(
-            value = "/{userId}",
+            value = ROUTE + "/{userId}",
             consumes = MediaType.APPLICATION_JSON_VALUE,
             produces = MediaType.APPLICATION_JSON_VALUE
     )
     ResponseEntity<UserResponse> update(
             @Valid @RequestBody UserRequest updateRequest,
             @PathVariable(value = "userId", required = true) String id);
-
 }
