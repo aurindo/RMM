@@ -5,6 +5,7 @@ import com.aurindo.gym.api.v1.user.model.UserResponse;
 import com.aurindo.gym.api.v1.user.model.UserResponseModelAssembler;
 import com.aurindo.gym.domain.model.User;
 import com.aurindo.gym.domain.user.UserService;
+import com.aurindo.gym.infrastructure.exception.BaseException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -35,7 +36,7 @@ public class UserController implements UserResource {
     @Override
     public ResponseEntity<UserResponse> create(
             final UserRequest createRequest
-    ) {
+    ) throws BaseException {
         final User user = createRequest.toUser();
         final User userCreated = userService.save(user);
         final UserResponse userResponse = UserResponse.fromUser(userCreated);
@@ -48,7 +49,7 @@ public class UserController implements UserResource {
     @Override
     public ResponseEntity<UserResponse> getById(
             final String id
-    ) {
+    ) throws BaseException {
 
         final User userReturned = userService.findById(id);
 
@@ -61,7 +62,6 @@ public class UserController implements UserResource {
     public ResponseEntity<PagedModel<UserResponse>> fetchAll(
             final Pageable pageable
     ) {
-//        final Pageable pageable = PageRequest.of(page, size);
         final Page<User> userEntities = userService.fetchAll(pageable);
 
         final PagedModel<UserResponse> pagedModel = pagedResourcesAssembler
@@ -84,7 +84,7 @@ public class UserController implements UserResource {
     public ResponseEntity<UserResponse> update(
             final UserRequest updateRequest,
             final String id
-    ) {
+    ) throws BaseException {
 
         final User user = updateRequest.toUser();
         user.setId(id);

@@ -2,6 +2,7 @@ package com.aurindo.gym.api.v1.user.model;
 
 import com.aurindo.gym.api.v1.user.UserController;
 import com.aurindo.gym.domain.model.User;
+import com.aurindo.gym.infrastructure.exception.BaseException;
 import org.springframework.beans.BeanUtils;
 import org.springframework.hateoas.server.mvc.RepresentationModelAssemblerSupport;
 import org.springframework.stereotype.Component;
@@ -21,7 +22,11 @@ public class UserResponseModelAssembler extends RepresentationModelAssemblerSupp
     {
         final UserResponse model = new UserResponse();
         BeanUtils.copyProperties(entity, model);
-        model.add(linkTo(methodOn(UserController.class).getById(entity.getId())).withSelfRel());
+        try {
+            model.add(linkTo(methodOn(UserController.class).getById(entity.getId())).withSelfRel());
+        } catch (BaseException e) {
+            throw new RuntimeException(e);
+        }
         model.add(linkTo(methodOn(UserController.class).delete(entity.getId())).withRel("delete"));
         return model;
     }

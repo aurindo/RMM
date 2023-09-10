@@ -1,6 +1,7 @@
 package com.aurindo.gym.domain.user;
 
 import com.aurindo.gym.domain.model.User;
+import com.aurindo.gym.infrastructure.exception.EntityNotFoundException;
 import com.aurindo.gym.infrastructure.repository.UserRepository;
 import com.aurindo.gym.infrastructure.repository.UserSearchRepository;
 import lombok.AllArgsConstructor;
@@ -28,9 +29,10 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public User findById(final String userId) {
-        return userRepository.findById(userId).
-                orElseThrow(RuntimeException::new);
+    public User findById(final String userId) throws EntityNotFoundException {
+        User user = userRepository.findById(userId).
+                orElseThrow(() -> new EntityNotFoundException(User.class, userId));
+        return user;
     }
 
     @Override
