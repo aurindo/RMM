@@ -16,6 +16,11 @@ import java.util.Date;
 @EntityListeners(AuditingEntityListener.class)
 public class User {
 
+    public User(String name, String description) {
+        this.name = name;
+        this.description = description;
+    }
+
     @Id
     @GeneratedValue(strategy= GenerationType.UUID)
     private String id;

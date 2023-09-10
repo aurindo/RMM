@@ -33,7 +33,7 @@ public class UserController implements UserResource {
     public ResponseEntity<UserResponse> create(
             final UserRequest createRequest
     ) {
-        final User user = createRequest.toUser();
+        final User user = new User(createRequest.name(), createRequest.description());
         final User userCreated = userService.save(user);
         final UserResponse userResponse = UserResponse.fromUser(userCreated);
 
@@ -81,8 +81,7 @@ public class UserController implements UserResource {
             final UserRequest updateRequest,
             final String id
     ) {
-
-        final User user = updateRequest.toUser();
+        final User user = new User(updateRequest.name(), updateRequest.description());
         user.setId(id);
 
         final User userUpdated = userService.update(user);

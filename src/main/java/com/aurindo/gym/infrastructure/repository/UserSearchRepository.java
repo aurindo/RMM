@@ -9,6 +9,6 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface UserSearchRepository extends PagingAndSortingRepository<User, String> {
 
-    Page<User> findAllByOrderByNameAsc(Pageable pageable);
+    Page<User> findAll(Pageable pageable);
 
 }
