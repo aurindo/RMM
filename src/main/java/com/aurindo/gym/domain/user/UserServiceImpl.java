@@ -1,14 +1,13 @@
 package com.aurindo.gym.domain.user;
 
 import com.aurindo.gym.domain.model.User;
+import com.aurindo.gym.infrastructure.exception.EntityNotFoundException;
 import com.aurindo.gym.infrastructure.repository.UserRepository;
 import com.aurindo.gym.infrastructure.repository.UserSearchRepository;
 import lombok.AllArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
-
-import java.util.Optional;
 
 @AllArgsConstructor
 @Service
@@ -28,27 +27,23 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public User findById(final String userId) {
-        return userRepository.findById(userId).
-                orElseThrow(RuntimeException::new);
+    public User findById(final String userId) throws EntityNotFoundException {
+        User user = userRepository.findById(userId).
+                orElseThrow(() -> new EntityNotFoundException(User.class, userId));
+        return user;
     }
 
     @Override
-    public void delete(final String userId) {
-        userRepository.findById(userId).ifPresent(
-                user -> userRepository.delete(user));
+    public void delete(final String userId) throws EntityNotFoundException {
+        var managedUer = userRepository.findById(userId).orElseThrow(() -> new EntityNotFoundException(User.class, userId));
+        userRepository.delete(managedUer);
     }
 
     @Override
-    public User update(final User user) {
-        final Optional<User> optionalUser = userRepository.findById(user.getId());
-
-        if (optionalUser.isPresent()) {
-            user.setCreated(optionalUser.get().getCreated());
-            userRepository.save(user);
-        } else {
-            throw new RuntimeException();
-        }
+    public User update(final User user) throws EntityNotFoundException {
+        var managedUer = userRepository.findById(user.getId()).orElseThrow(() -> new EntityNotFoundException(User.class, user.getId()));
+        user.setCreated(managedUer.getCreated());
+        userRepository.save(user);
 
         return user;
     }
