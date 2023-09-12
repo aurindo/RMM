@@ -2,6 +2,7 @@ package com.aurindo.gym.api.v1.user.model;
 
 import com.aurindo.gym.api.v1.user.UserController;
 import com.aurindo.gym.domain.model.User;
+import com.aurindo.gym.domain.util.DateUtil;
 import com.aurindo.gym.infrastructure.exception.BaseException;
 import org.springframework.beans.BeanUtils;
 import org.springframework.hateoas.server.mvc.RepresentationModelAssemblerSupport;
@@ -22,6 +23,11 @@ public class UserResponseModelAssembler extends RepresentationModelAssemblerSupp
     {
         final UserResponse model = new UserResponse();
         BeanUtils.copyProperties(entity, model);
+        try {
+            model.setCreated(DateUtil.dateToZonedDateTime(entity.getCreated()));
+        } catch (BaseException e) {
+            //Supress exception
+        }
         try {
             model.add(linkTo(methodOn(UserController.class).getById(entity.getId())).withSelfRel());
         } catch (BaseException e) {

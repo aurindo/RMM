@@ -31,7 +31,7 @@ public class UserResponse extends RepresentationModel<UserResponse> {
         final UserResponse userResponse = UserResponse.builder().
                 name(user.getName()).
                 description(user.getDescription()).
-                created(DateUtil.dateToZonedDateTime(user.getCreated())).
+                created(user.getCreated() != null ? DateUtil.dateToZonedDateTime(user.getCreated()) : null).
                 id(user.getId()).build();
 
         userResponse.add(linkTo(methodOn(UserController.class).getById(user.getId())).withSelfRel());

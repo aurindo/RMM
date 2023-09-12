@@ -34,21 +34,17 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public void delete(final String userId) {
-        userRepository.findById(userId).ifPresentOrElse(
-                user -> userRepository.delete(user),
-                () -> new EntityNotFoundException(User.class, userId));
+    public void delete(final String userId) throws EntityNotFoundException {
+        var managedUer = userRepository.findById(userId).orElseThrow(() -> new EntityNotFoundException(User.class, userId));
+        userRepository.delete(managedUer);
     }
 
     @Override
-    public User update(final User user) {
-        userRepository.findById(user.getId()).ifPresentOrElse(
-                optionalUser ->
-                    {
-                        user.setCreated(optionalUser.getCreated());
-                        userRepository.save(user);
-                    },
-                () -> new EntityNotFoundException(User.class, user.getId()));
+    public User update(final User user) throws EntityNotFoundException {
+        var managedUer = userRepository.findById(user.getId()).orElseThrow(() -> new EntityNotFoundException(User.class, user.getId()));
+        user.setCreated(managedUer.getCreated());
+        userRepository.save(user);
+
         return user;
     }
 }

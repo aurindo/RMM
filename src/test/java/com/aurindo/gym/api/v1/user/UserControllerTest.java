@@ -70,6 +70,7 @@ final class UserControllerTest {
                 .andExpect(status().isCreated())
                 .andExpect(jsonPath("name", is(user.getName())))
                 .andExpect(jsonPath("id", is(user.getId())))
+                .andExpect(jsonPath("created").isNotEmpty())
                 .andExpect(jsonPath("description", is(user.getDescription())))
                 .andExpect(header().string("Location", USER_URL + user.getId()))
                 .andExpect(jsonPath("_links.self.href", is(USER_URL + user.getId())))
@@ -94,6 +95,7 @@ final class UserControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("name", is(user.getName())))
                 .andExpect(jsonPath("id", is(user.getId())))
+                .andExpect(jsonPath("created").isNotEmpty())
                 .andExpect(jsonPath("description", is(user.getDescription())))
                 .andExpect(jsonPath("_links.self.href", is(USER_URL + user.getId())))
                 .andExpect(jsonPath("_links.delete.href", is(USER_URL + user.getId())));
@@ -145,6 +147,7 @@ final class UserControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("_embedded.userResponseList[0].name", is(userB.getName())))
                 .andExpect(jsonPath("_embedded.userResponseList[0].id", is(userB.getId())))
+                .andExpect(jsonPath("_embedded.userResponseList[0].created").isNotEmpty())
                 .andExpect(jsonPath("_embedded.userResponseList[0].description", is(userB.getDescription())))
                 .andExpect(jsonPath("_embedded.userResponseList[0]._links.self.href", is("http://localhost/api/v1/users/" + userB.getId())))
                 .andExpect(jsonPath("_embedded.userResponseList[0]._links.delete.href", is("http://localhost/api/v1/users/" + userB.getId())))

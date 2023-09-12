@@ -31,7 +31,6 @@ public class User {
     @NotEmpty
     private String description;
 
-    @NotEmpty
     @CreatedDate
     @Column(nullable = false, updatable = false)
     private Date created;
