@@ -1,0 +1,163 @@
+{
+	"info": {
+		"_postman_id": "439d636d-9676-4093-b83b-fa78408aacda",
+		"name": "gym - HATEOAS",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "15004700"
+	},
+	"item": [
+		{
+			"name": "List all users",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "http://localhost:8080/api/v1/users",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"v1",
+						"users"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Create a new user",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"name\":\"11\",\n    \"description\":\"desc_11\"\n}"
+				},
+				"url": {
+					"raw": "http://localhost:8080/api/v1/users",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"v1",
+						"users"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Edit an user",
+			"request": {
+				"method": "PUT",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"name\":1,\n    \"description\":2\n}"
+				},
+				"url": {
+					"raw": "http://localhost:8080/api/v1/users/fbd69521-e9ff-41dc-be71-8bc78c400442",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"v1",
+						"users",
+						"fbd69521-e9ff-41dc-be71-8bc78c400442"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get a specific user by ID",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"name\": \"name_g\",\n    \"description\": \"desc_g\"\n}"
+				},
+				"url": {
+					"raw": "http://localhost:8080/api/v1/users/98520da1-7856-4952-86c5-b5d49753f86b",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"v1",
+						"users",
+						"98520da1-7856-4952-86c5-b5d49753f86b"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Delete an user",
+			"request": {
+				"method": "DELETE",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "http://localhost:8080/api/v1/users/55310847-c4d7-4618-98fd-dbba3b143d4c",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"v1",
+						"users",
+						"55310847-c4d7-4618-98fd-dbba3b143d4c"
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}
