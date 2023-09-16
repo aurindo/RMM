@@ -4,6 +4,7 @@ import com.aurindo.gym.api.v1.user.model.UserResponse;
 import com.aurindo.gym.api.v1.user.model.UserRequest;
 import com.aurindo.gym.infrastructure.exception.BaseException;
 import com.aurindo.gym.infrastructure.exception.EntityNotFoundException;
+import com.aurindo.gym.infrastructure.exception.WrongParameterException;
 import jakarta.validation.Valid;
 import org.springframework.data.domain.Pageable;
 import org.springframework.hateoas.PagedModel;
@@ -21,7 +22,7 @@ public interface UserResource {
     )
     ResponseEntity<PagedModel<UserResponse>> fetchAll(
             Pageable pageable
-    );
+    ) throws WrongParameterException;
 
     @PostMapping(
             value = ROUTE,
