@@ -1,6 +1,9 @@
 package com.aurindo.gym.infrastructure.api.rest;
 
+import com.aurindo.gym.infrastructure.exception.BaseException;
 import com.aurindo.gym.infrastructure.exception.EntityNotFoundException;
+import com.aurindo.gym.infrastructure.exception.WrongParameterException;
+import org.springframework.data.mapping.PropertyReferenceException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -15,11 +18,25 @@ import java.util.List;
 public class RestAPIExceptionHandler extends ResponseEntityExceptionHandler {
 
     @ExceptionHandler(EntityNotFoundException.class)
-    public ResponseEntity<Object> handleMyException(EntityNotFoundException ex) {
+    public ResponseEntity<Object> handleEntityNotFoundException(EntityNotFoundException ex) {
 
         RestAPIError err = new RestAPIError(
                 ZonedDateTime.now(),
                 HttpStatus.NOT_FOUND,
+                ex.getMessage() ,
+                null);
+
+        return ResponseEntityBuilder.build(err);
+
+    }
+
+
+    @ExceptionHandler(WrongParameterException.class)
+    public ResponseEntity<Object> handleBadRequestExceptions(BaseException ex) {
+
+        RestAPIError err = new RestAPIError(
+                ZonedDateTime.now(),
+                HttpStatus.BAD_REQUEST,
                 ex.getMessage() ,
                 null);
 

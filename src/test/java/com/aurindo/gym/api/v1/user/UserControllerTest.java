@@ -6,6 +6,7 @@ import com.aurindo.gym.domain.model.User;
 import com.aurindo.gym.domain.user.UserService;
 import com.aurindo.gym.infrastructure.api.rest.RestAPIExceptionHandler;
 import com.aurindo.gym.infrastructure.exception.EntityNotFoundException;
+import com.aurindo.gym.infrastructure.exception.WrongParameterException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
@@ -16,6 +17,7 @@ import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Sort;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
@@ -116,7 +118,7 @@ final class UserControllerTest {
                 .contentType(MediaType.APPLICATION_JSON)
                 .accept(MediaType.APPLICATION_JSON));
         result
-                .andExpect(status().is(404))
+                .andExpect(status().is(HttpStatus.NOT_FOUND.value()))
                 .andExpect(jsonPath("status", is("NOT_FOUND")))
                 .andExpect(jsonPath("message", is("User not found. Parameters: " + unknowingId)));
 
@@ -143,6 +145,7 @@ final class UserControllerTest {
                 .get("/api/v1/users?page=1&size=1")
                 .contentType(MediaType.APPLICATION_JSON)
                 .accept(MediaType.APPLICATION_JSON));
+
         result
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("_embedded.userResponseList[0].name", is(userB.getName())))
@@ -167,6 +170,63 @@ final class UserControllerTest {
         verify(userPage, VerificationModeFactory.times(3)).getTotalPages();
         verify(userPage, VerificationModeFactory.times(2)).hasPrevious();
         verify(userPage, VerificationModeFactory.times(1)).hasNext();
+        verify(userService, VerificationModeFactory.times(1)).fetchAll(Mockito.any());
+        reset(userService);
+    }
+
+    @Test
+    public void whenTryToFetchAllUsersSortingByWrongPropertyShouldReturnErrorMessage() throws Exception {
+
+        final var wrongProperty = "descriptioAn";
+        final var exception = new WrongParameterException(
+                "No property 'descriptioan' found for type 'User'; Did you mean 'description'",
+                null);
+
+        given(userService.fetchAll(Mockito.any())).willThrow(exception);
+
+        final var result = mvc.perform( MockMvcRequestBuilders
+                .get("/api/v1/users?sort=" + wrongProperty)
+                .contentType(MediaType.APPLICATION_JSON)
+                .accept(MediaType.APPLICATION_JSON));
+
+        result
+                .andExpect(status().is(HttpStatus.BAD_REQUEST.value()))
+                .andExpect(jsonPath("status", is("BAD_REQUEST")))
+                .andExpect(jsonPath("message", is("No property 'descriptioan' found for type 'User'; Did you mean 'description'")));
+
+        verify(userService, VerificationModeFactory.times(1)).fetchAll(Mockito.any());
+        reset(userService);
+    }
+
+    @Test
+    public void whenTryToFetchAllUsersWithWrongPageParameterShouldIgnoreThePageParameterAndReturnAll() throws Exception {
+
+        final var wrongParameter = "a";
+        final var userList = Arrays.asList(userFactory("A"), userFactory("B"));
+
+        given(userPage.iterator()).willReturn(userList.iterator());
+        given(userPage.getTotalElements()).willReturn(2l);
+        given(userPage.getSize()).willReturn(20);
+        given(userPage.getNumber()).willReturn(0);
+        given(userPage.getTotalPages()).willReturn(1);
+        given(userPage.hasPrevious()).willReturn(true);
+        given(userPage.hasNext()).willReturn(true);
+        given(userPage.getSort()).willReturn(Sort.unsorted());
+
+        given(userService.fetchAll(Mockito.any())).willReturn(userPage);
+
+        final var result = mvc.perform( MockMvcRequestBuilders
+                .get("/api/v1/users?page=" + wrongParameter)
+                .contentType(MediaType.APPLICATION_JSON)
+                .accept(MediaType.APPLICATION_JSON));
+
+        result
+                .andExpect(status().is(HttpStatus.OK.value()))
+                .andExpect(jsonPath("page.size", is(20)))
+                .andExpect(jsonPath("page.totalElements", is(2)))
+                .andExpect(jsonPath("page.totalPages", is(1)))
+                .andExpect(jsonPath("page.number", is(0)));
+
         verify(userService, VerificationModeFactory.times(1)).fetchAll(Mockito.any());
         reset(userService);
     }

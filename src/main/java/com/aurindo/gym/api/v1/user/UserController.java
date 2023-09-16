@@ -6,6 +6,7 @@ import com.aurindo.gym.api.v1.user.model.UserResponseModelAssembler;
 import com.aurindo.gym.domain.model.User;
 import com.aurindo.gym.domain.user.UserService;
 import com.aurindo.gym.infrastructure.exception.BaseException;
+import com.aurindo.gym.infrastructure.exception.WrongParameterException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -58,7 +59,7 @@ public class UserController implements UserResource {
     @Override
     public ResponseEntity<PagedModel<UserResponse>> fetchAll(
             final Pageable pageable
-    ) {
+    ) throws WrongParameterException {
         final Page<User> userEntities = userService.fetchAll(pageable);
 
         final PagedModel<UserResponse> pagedModel = pagedResourcesAssembler

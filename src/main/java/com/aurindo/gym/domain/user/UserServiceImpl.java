@@ -2,11 +2,13 @@ package com.aurindo.gym.domain.user;
 
 import com.aurindo.gym.domain.model.User;
 import com.aurindo.gym.infrastructure.exception.EntityNotFoundException;
+import com.aurindo.gym.infrastructure.exception.WrongParameterException;
 import com.aurindo.gym.infrastructure.repository.UserRepository;
 import com.aurindo.gym.infrastructure.repository.UserSearchRepository;
 import lombok.AllArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.mapping.PropertyReferenceException;
 import org.springframework.stereotype.Service;
 
 @AllArgsConstructor
@@ -17,8 +19,12 @@ public class UserServiceImpl implements UserService {
     private UserSearchRepository userSearchRepository;
 
     @Override
-    public Page<User> fetchAll(final Pageable pageable) {
-        return userSearchRepository.findAll(pageable);
+    public Page<User> fetchAll(final Pageable pageable) throws WrongParameterException {
+        try {
+            return userSearchRepository.findAll(pageable);
+        } catch (PropertyReferenceException e) {
+            throw new WrongParameterException(e.getMessage(), e);
+        }
     }
 
     @Override
